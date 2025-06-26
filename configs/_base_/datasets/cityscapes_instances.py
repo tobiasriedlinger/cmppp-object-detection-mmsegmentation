@@ -1,5 +1,5 @@
 # dataset settings
-dataset_type = 'CityscapesDataset'
+dataset_type = 'CityscapesInstancesDataset'
 data_root = '/cfs/projects/milz/datasets_robin/cityscapes/'
 crop_size = (512, 1024)
 train_pipeline = [
@@ -40,8 +40,8 @@ tta_pipeline = [
         ])
 ]
 train_dataloader = dict(
-    batch_size=2,
-    num_workers=2,
+    batch_size=16,
+    num_workers=4,
     persistent_workers=True,
     sampler=dict(type='InfiniteSampler', shuffle=True),
     dataset=dict(
@@ -65,7 +65,3 @@ test_dataloader = val_dataloader
 
 val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
 test_evaluator = val_evaluator
-
-vis_backends = [dict(type='LocalVisBackend')]
-visualizer = dict(
-    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')

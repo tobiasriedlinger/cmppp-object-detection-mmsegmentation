@@ -5,6 +5,7 @@ from .basesegdataset import BaseCDDataset, BaseSegDataset
 from .bdd100k import BDD100KDataset
 from .chase_db1 import ChaseDB1Dataset
 from .cityscapes import CityscapesDataset
+from .cityscapes_instances import CityscapesInstancesDataset
 from .coco_stuff import COCOStuffDataset
 from .dark_zurich import DarkZurichDataset
 from .dataset_wrappers import MultiImageMixDataset
@@ -12,7 +13,6 @@ from .decathlon import DecathlonDataset
 from .drive import DRIVEDataset
 from .dsdl import DSDLSegDataset
 from .hrf import HRFDataset
-from .hsi_drive import HSIDrive20Dataset
 from .isaid import iSAIDDataset
 from .isprs import ISPRSDataset
 from .levir import LEVIRCDDataset
@@ -44,7 +44,7 @@ from .voc import PascalVOCDataset
 # yapf: enable
 __all__ = [
     'BaseSegDataset', 'BioMedical3DRandomCrop', 'BioMedical3DRandomFlip',
-    'CityscapesDataset', 'PascalVOCDataset', 'ADE20KDataset',
+    'CityscapesDataset', 'CityscapesInstancesDataset', 'PascalVOCDataset', 'ADE20KDataset',
     'PascalContextDataset', 'PascalContextDataset59', 'ChaseDB1Dataset',
     'DRIVEDataset', 'HRFDataset', 'STAREDataset', 'DarkZurichDataset',
     'NightDrivingDataset', 'COCOStuffDataset', 'LoveDADataset',
@@ -61,5 +61,5 @@ __all__ = [
     'MapillaryDataset_v2', 'Albu', 'LEVIRCDDataset',
     'LoadMultipleRSImageFromFile', 'LoadSingleRSImageFromFile',
     'ConcatCDInput', 'BaseCDDataset', 'DSDLSegDataset', 'BDD100KDataset',
-    'NYUDataset', 'HSIDrive20Dataset'
+    'NYUDataset'
 ]

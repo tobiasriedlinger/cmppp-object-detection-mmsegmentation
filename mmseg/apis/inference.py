@@ -149,7 +149,7 @@ def show_result_pyplot(model: BaseSegmentor,
             Default to True.
         with_labels(bool, optional): Add semantic labels in visualization
             result, Default to True.
-        save_dir (str, optional): Save file dir for all storage backends.
+        save_dir (str, optional):s Save file dir for all storage backend.
             If it is None, the backend storage will not save any data.
         out_file (str, optional): Path to output file. Default to None.
 

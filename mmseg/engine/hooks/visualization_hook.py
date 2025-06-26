@@ -4,7 +4,7 @@ import warnings
 from typing import Optional, Sequence
 
 import mmcv
-from mmengine.fileio import get
+import mmengine.fileio as fileio
 from mmengine.hooks import Hook
 from mmengine.runner import Runner
 from mmengine.visualization import Visualizer
@@ -61,69 +61,37 @@ class SegVisualizationHook(Hook):
                           'hook for visualization will not take '
                           'effect. The results will NOT be '
                           'visualized or stored.')
-        self._test_index = 0
 
-    def after_val_iter(self, runner: Runner, batch_idx: int, data_batch: dict,
-                       outputs: Sequence[SegDataSample]) -> None:
+    def _after_iter(self,
+                    runner: Runner,
+                    batch_idx: int,
+                    data_batch: dict,
+                    outputs: Sequence[SegDataSample],
+                    mode: str = 'val') -> None:
         """Run after every ``self.interval`` validation iterations.
 
         Args:
             runner (:obj:`Runner`): The runner of the validation process.
             batch_idx (int): The index of the current batch in the val loop.
             data_batch (dict): Data from dataloader.
-            outputs (Sequence[:obj:`SegDataSample`]]): A batch of data samples
-                that contain annotations and predictions.
+            outputs (Sequence[:obj:`SegDataSample`]): Outputs from model.
+            mode (str): mode (str): Current mode of runner. Defaults to 'val'.
         """
-        if self.draw is False:
+        if self.draw is False or mode == 'train':
             return
 
-        # There is no guarantee that the same batch of images
-        # is visualized for each evaluation.
-        total_curr_iter = runner.iter + batch_idx
+        if self.every_n_inner_iters(batch_idx, self.interval):
+            for output in outputs:
+                img_path = output.img_path
+                img_bytes = fileio.get(
+                    img_path, backend_args=self.backend_args)
+                img = mmcv.imfrombytes(img_bytes, channel_order='rgb')
+                window_name = f'{mode}_{osp.basename(img_path)}'
 
-        # Visualize only the first data
-        img_path = outputs[0].img_path
-        img_bytes = get(img_path, backend_args=self.backend_args)
-        img = mmcv.imfrombytes(img_bytes, channel_order='rgb')
-        window_name = f'val_{osp.basename(img_path)}'
-
-        if total_curr_iter % self.interval == 0:
-            self._visualizer.add_datasample(
-                window_name,
-                img,
-                data_sample=outputs[0],
-                show=self.show,
-                wait_time=self.wait_time,
-                step=total_curr_iter)
-
-    def after_test_iter(self, runner: Runner, batch_idx: int, data_batch: dict,
-                        outputs: Sequence[SegDataSample]) -> None:
-        """Run after every testing iterations.
-
-        Args:
-            runner (:obj:`Runner`): The runner of the testing process.
-            batch_idx (int): The index of the current batch in the val loop.
-            data_batch (dict): Data from dataloader.
-            outputs (Sequence[:obj:`SegDataSample`]): A batch of data samples
-                that contain annotations and predictions.
-        """
-        if self.draw is False:
-            return
-
-        for data_sample in outputs:
-            self._test_index += 1
-
-            img_path = data_sample.img_path
-            window_name = f'test_{osp.basename(img_path)}'
-
-            img_path = data_sample.img_path
-            img_bytes = get(img_path, backend_args=self.backend_args)
-            img = mmcv.imfrombytes(img_bytes, channel_order='rgb')
-
-            self._visualizer.add_datasample(
-                window_name,
-                img,
-                data_sample=data_sample,
-                show=self.show,
-                wait_time=self.wait_time,
-                step=self._test_index)
+                self._visualizer.add_datasample(
+                    window_name,
+                    img,
+                    data_sample=output,
+                    show=self.show,
+                    wait_time=self.wait_time,
+                    step=runner.iter)

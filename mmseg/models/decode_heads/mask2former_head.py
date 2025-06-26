@@ -4,13 +4,13 @@ from typing import List, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mmengine.model import BaseModule
+from mmengine.model import BaseModule as MMDET_Mask2FormerHead
 
-try:
-    from mmdet.models.dense_heads import \
-        Mask2FormerHead as MMDET_Mask2FormerHead
-except ModuleNotFoundError:
-    MMDET_Mask2FormerHead = BaseModule
+# try:
+#     from mmdet.models.dense_heads import \
+#         Mask2FormerHead as MMDET_Mask2FormerHead
+# except ModuleNotFoundError:
+#     MMDET_Mask2FormerHead = BaseModule
 
 from mmengine.structures import InstanceData
 from torch import Tensor

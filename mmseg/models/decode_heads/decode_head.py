@@ -8,9 +8,9 @@ import torch.nn as nn
 from mmengine.model import BaseModule
 from torch import Tensor
 
-from mmseg.registry import MODELS
 from mmseg.structures import build_pixel_sampler
 from mmseg.utils import ConfigType, SampleList
+from ..builder import build_loss
 from ..losses import accuracy
 from ..utils import resize
 
@@ -140,11 +140,11 @@ class BaseDecodeHead(BaseModule, metaclass=ABCMeta):
         self.threshold = threshold
 
         if isinstance(loss_decode, dict):
-            self.loss_decode = MODELS.build(loss_decode)
+            self.loss_decode = build_loss(loss_decode)
         elif isinstance(loss_decode, (list, tuple)):
             self.loss_decode = nn.ModuleList()
             for loss in loss_decode:
-                self.loss_decode.append(MODELS.build(loss))
+                self.loss_decode.append(build_loss(loss))
         else:
             raise TypeError(f'loss_decode must be a dict or sequence of dict,\
                 but got {type(loss_decode)}')
@@ -333,8 +333,17 @@ class BaseDecodeHead(BaseModule, metaclass=ABCMeta):
                     weight=seg_weight,
                     ignore_index=self.ignore_index)
 
-        loss['acc_seg'] = accuracy(
-            seg_logits, seg_label, ignore_index=self.ignore_index)
+        # loss['acc_seg'] = accuracy(
+        #     seg_logits, seg_label, ignore_index=self.ignore_index)
+        # count_loss = torch.tensor(0.).to(loss['loss_nll'].device)
+        # for b, l in enumerate(seg_label):
+        #     batch_ids = l.unique()
+        #     batch_ids = batch_ids[batch_ids>100]
+            
+        #     expected_count = torch.mean(torch.exp(seg_logits[b]))
+        #     count_loss += (len(batch_ids) - expected_count)**2 / len(seg_label)
+        # loss['count_diff'] = 10* count_loss
+        
         return loss
 
     def predict_by_feat(self, seg_logits: Tensor,
