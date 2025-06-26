@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'CityscapesDataset'
-data_root = '/cfs/projects/milz/datasets_robin/cityscapes/'
+data_root = 'data/cityscapes/'
 crop_size = (512, 1024)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
